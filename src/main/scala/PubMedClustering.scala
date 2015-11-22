@@ -4,10 +4,6 @@ import breeze.linalg.DenseVector
 
 import java.io.Serializable
 
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.FileSystem
-import org.apache.hadoop.fs.Path
-import org.apache.spark.SparkContext
 import org.apache.spark.mllib.clustering.KMeans
 import org.apache.spark.mllib.feature.HashingTF
 import org.apache.spark.mllib.feature.IDF
@@ -15,19 +11,7 @@ import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
 
 object PubMedClustering extends Serializable {
-  def work(sc: SparkContext) = {
-    val papers = parseData(sc)
-    val featureVectors = constructFeatureVectorsFromPapers(papers)
-    val clustersOfPapers = clusterPapers(featureVectors)
-    summarize(papers, clustersOfPapers)
-  }
-
-  def parseData(sc: SparkContext): RDD[Map[String, Array[String]]] = {
-    val configuration = new Configuration()
-    configuration.addResource(new Path("/usr/hdp/2.3.0.0-2557/hadoop/conf/core-site.xml"))
-
-    //val lines = sc.textFile(FileSystem.get(configuration).getUri + "/ist597j/PubMed/pubmed.csv")
-    val lines = sc.textFile(FileSystem.get(configuration).getUri + "/storage/md1/share/work/classes/ist597d-big-data/term-project/pubmed.csv")
+  def parseData(lines: RDD[String]): RDD[Map[String, Array[String]]] = {
     val rows = lines.map(line => line.split(','))
     return rows.map(rowToPaper)
   }
