@@ -1,21 +1,11 @@
 package ist597d
 
-import breeze.linalg.DenseVector
-
-import java.io.Serializable
-
-import org.apache.spark.mllib.clustering.KMeans
 import org.apache.spark.mllib.feature.HashingTF
 import org.apache.spark.mllib.feature.IDF
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
 
-object PubMedClustering extends Serializable {
-  def parseData(lines: RDD[String]): RDD[Map[String, Array[String]]] = {
-    val rows = lines.map(line => line.split(','))
-    return rows.map(rowToPaper)
-  }
-
+object FeatureExtraction extends Serializable {
   def constructFeatureVectorsFromPapers(papers: RDD[Map[String, Array[String]]]): RDD[Vector] = {
     val wordsOfPapers = papers.map(getWordsOfPaper)
     return constructFeatureVectors(wordsOfPapers)
@@ -27,43 +17,6 @@ object PubMedClustering extends Serializable {
     val idfModel = new IDF().fit(tfVectors)
     val tfidfVectors = idfModel.transform(tfVectors).cache()
     return tfidfVectors
-  }
-
-  def clusterPapers(featureVectors: RDD[Vector]): RDD[Int] = {
-    val numClusters = 3
-    val numIterations = 1000
-
-    val kmModel = KMeans.train(featureVectors, numClusters, numIterations)
-    return kmModel.predict(featureVectors)
-  }
-
-  def summarize(papers: RDD[Map[String, Array[String]]], clustersOfPapers: RDD[Int]): Unit = {
-    // Prepare the report
-
-    val numPapersInClusters = clustersOfPapers.groupBy(x=>x).map(x=>(x._1, x._2.size))
-    val numPapersInOrderedClusters = numPapersInClusters.sortBy(_._1)
-
-    val keywordsOfPapers = papers.map(getKeywordsOfPaper)
-
-    val clusterKeywordsPairsOfPapers = clustersOfPapers.zip(keywordsOfPapers)
-    // clusterKeywordsPairsOfPapers: [(1, ["k1", "k2"]), (0, ["k3", "k4", ...]),... ]
-
-    val keywordsOfClusters = clusterKeywordsPairsOfPapers.groupBy(_._1).mapValues(_.flatMap(_._2))
-
-    val sortedKeywordCountPairsOfClusters = keywordsOfClusters.mapValues(keywords => toSortedKeywordCountPairs(keywords.toArray))
-    val sortedKeywordCountPairsOfOrderedClusters = sortedKeywordCountPairsOfClusters.sortBy(_._1)
-
-    val paperCountKeywordCountPairs = numPapersInOrderedClusters.zip(sortedKeywordCountPairsOfOrderedClusters)
-    paperCountKeywordCountPairs.collect().foreach(x => {  // it is important to use collect() here, or the print order will be random
-      println("cluster " + x._1._1 + ": " + x._1._2 + " papers")
-      x._2._2.take(5).foreach(kc=>println("\t" + kc._1 + " (" + kc._2 + ")"))
-    })
-  }
-
-  // Input:  ["I:1", "N:a1", "N:a2", "A:blah"]
-  // Output: {"I": [1], "N": ["a1", "a2"], "A": ["blah"]}
-  def rowToPaper(row: Array[String]): Map[String, Array[String]]= {
-      return row.groupBy(_(0).toString).map(x => (x._1, x._2.map(_.substring(2))))
   }
 
   def getWordsOfPaper(paper: Map[String, Array[String]]): Iterable[String] = {
@@ -103,15 +56,5 @@ object PubMedClustering extends Serializable {
                          "too", "Too", "also", "Also", "either", "Either", "neither", "Neither",
                          "there", "There", "here", "Here")
     return words.filter(w => !stopWords.contains(w))
-  }
-
-  def getKeywordsOfPaper(paper: Map[String, Array[String]]): Array[String] = {
-    val keywords = paper.getOrElse("K", Array())
-    return keywords
-  }
-
-  def toSortedKeywordCountPairs(keywords: Array[String]): Array[(String, Int)] = {
-    val keywordCountPairs = keywords.groupBy(x=>x).map(x => (x._1, x._2.size))
-    return keywordCountPairs.toArray.sortWith(_._2 > _._2)
   }
 }
