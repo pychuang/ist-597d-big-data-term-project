@@ -5,7 +5,8 @@ import org.apache.spark.rdd.RDD
 object Helper extends Serializable {
   def parseData(lines: RDD[String]): RDD[Map[String, Array[String]]] = {
     val rows = lines.map(line => line.split(','))
-    return rows.map(rowToPaper)
+    val papers = rows.map(rowToPaper)
+    return papers.filter(m => m.contains("A"))
   }
 
   // Input:  ["I:1", "N:a1", "N:a2", "A:blah"]
