@@ -1,6 +1,6 @@
 import ist597d.Helper
 import ist597d.FeatureExtraction
-import ist597d.Clustering
+import ist597d.KMeansClustering
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
@@ -14,5 +14,5 @@ val lines = sc.textFile(FileSystem.get(configuration).getUri + "/storage/md1/sha
 
 val papers = Helper.parseData(lines)
 val featureVectors = FeatureExtraction.constructFeatureVectorsFromPapers(papers)
-val clustersOfPapers = Clustering.clusterPapers(featureVectors)
+val clustersOfPapers = new KMeansClustering(3, 100).clusterPapers(featureVectors)
 Helper.summarize(papers, clustersOfPapers)
