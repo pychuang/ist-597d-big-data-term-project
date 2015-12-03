@@ -15,7 +15,7 @@ object Helper extends Serializable {
       return row.groupBy(_(0).toString).map(x => (x._1, x._2.map(_.substring(2)).map(_.toLowerCase)))
   }
 
-  def summarize(papers: RDD[Map[String, Array[String]]], clustersOfPapers: RDD[Int]): Unit = {
+  def summarize(papers: RDD[Map[String, Array[String]]], clustersOfPapers: RDD[Int], n: Int): Unit = {
     // Prepare the report
 
     val numPapersInClusters = clustersOfPapers.groupBy(x=>x).map(x=>(x._1, x._2.size))
@@ -34,7 +34,7 @@ object Helper extends Serializable {
     val paperCountKeywordCountPairs = numPapersInOrderedClusters.zip(sortedKeywordCountPairsOfOrderedClusters)
     paperCountKeywordCountPairs.collect().foreach(x => {  // it is important to use collect() here, or the print order will be random
       println("cluster " + x._1._1 + ": " + x._1._2 + " papers")
-      x._2._2.take(5).foreach(kc=>println("\t" + kc._1 + " (" + kc._2 + ")"))
+      x._2._2.take(n).foreach(kc=>println("\t" + kc._1 + " (" + kc._2 + ")"))
     })
   }
 

@@ -15,4 +15,4 @@ val lines = sc.textFile(FileSystem.get(configuration).getUri + "/storage/md1/sha
 val papers = Helper.parseData(lines)
 val featureVectors = FeatureExtraction.constructFeatureVectorsFromPapers(papers)
 val clustersOfPapers = new KMeansClustering(3, 100).clusterPapers(featureVectors)
-Helper.summarize(papers, clustersOfPapers)
+Helper.summarize(papers, clustersOfPapers, 10)
