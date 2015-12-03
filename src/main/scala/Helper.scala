@@ -40,7 +40,7 @@ object Helper extends Serializable {
 
   def getKeywordsOfPaper(paper: Map[String, Array[String]]): Array[String] = {
     val keywords = paper.getOrElse("K", Array())
-    return keywords
+    return keywords.flatMap(_.split("[;/_]")).map(_.trim)
   }
 
   def toSortedKeywordCountPairs(keywords: Array[String]): Array[(String, Int)] = {
