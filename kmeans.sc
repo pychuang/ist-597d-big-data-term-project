@@ -14,5 +14,10 @@ val lines = sc.textFile(FileSystem.get(configuration).getUri + "/storage/md1/sha
 
 val papers = Helper.parseData(lines)
 val featureVectors = FeatureExtraction.constructFeatureVectorsFromPapers(papers).cache()
+
+val start = System.nanoTime
 val clustersOfPapers = new KMeansClustering(3, 100).clusterPapers(featureVectors)
+val end = System.nanoTime
+println((end - start) / 1000000 + "ms")
+
 Helper.summarize(papers, clustersOfPapers, 10)
