@@ -15,7 +15,7 @@ object FeatureExtraction extends Serializable {
     val hashingTF = new HashingTF()
     val tfVectors = hashingTF.transform(wordsOfPapers)
     val idfModel = new IDF().fit(tfVectors)
-    val tfidfVectors = idfModel.transform(tfVectors).cache()
+    val tfidfVectors = idfModel.transform(tfVectors)
     return tfidfVectors
   }
 

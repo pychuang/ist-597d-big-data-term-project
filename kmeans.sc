@@ -13,6 +13,6 @@ configuration.addResource(new Path("/usr/hdp/2.3.0.0-2557/hadoop/conf/core-site.
 val lines = sc.textFile(FileSystem.get(configuration).getUri + "/storage/md1/share/work/classes/ist597d-big-data/term-project/pubmed.csv")
 
 val papers = Helper.parseData(lines)
-val featureVectors = FeatureExtraction.constructFeatureVectorsFromPapers(papers)
+val featureVectors = FeatureExtraction.constructFeatureVectorsFromPapers(papers).cache()
 val clustersOfPapers = new KMeansClustering(3, 100).clusterPapers(featureVectors)
 Helper.summarize(papers, clustersOfPapers, 10)
