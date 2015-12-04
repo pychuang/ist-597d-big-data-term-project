@@ -11,5 +11,5 @@ $ sbt package
 ```sh
 $ spark-shell --jars target/scala-2.10/ist597d_2.10-1.0.jar --master yarn-client --driver-memory 2g --executor-memory 2g
 
-scala> :load TermProject.sc
+scala> :load kmeans.sc
 ```
