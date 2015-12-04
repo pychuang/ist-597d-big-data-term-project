@@ -18,6 +18,6 @@ val featureVectors = FeatureExtraction.constructFeatureVectorsFromPapers(papers)
 val start = System.nanoTime
 val clustersOfPapers = new KMeansClustering(3, 100).clusterPapers(featureVectors)
 val end = System.nanoTime
-println((end - start) / 1000000 + "ms")
 
 Helper.summarize(papers, clustersOfPapers, 10)
+println((end - start) / 1000000 + "ms")
