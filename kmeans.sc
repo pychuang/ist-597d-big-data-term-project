@@ -10,6 +10,7 @@ val configuration = new Configuration()
 configuration.addResource(new Path("/usr/hdp/2.3.0.0-2557/hadoop/conf/core-site.xml"))
 
 //val lines = sc.textFile(FileSystem.get(configuration).getUri + "/ist597j/PubMed/pubmed.csv")
+//val lines = sc.textFile(FileSystem.get(configuration).getUri + "/ist597j/PubMedCSV/PubMedCSV.csv")
 val lines = sc.textFile(FileSystem.get(configuration).getUri + "/storage/md1/share/work/classes/ist597d-big-data/term-project/pubmed.csv")
 
 val papers = Helper.parseData(lines)
